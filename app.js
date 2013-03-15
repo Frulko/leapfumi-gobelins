@@ -1,49 +1,11 @@
-var fs = require('fs');
-var path = require('path');
-var app = require('http').createServer(function(req, res){
-
-    var filePath = req.url;
-    var test = filePath.substring(2);
-    var regex = /id/;
-
-    if (filePath == '/' || test.match(regex)) {
-        filePath = '/index.html';
-    }
-    else{
-        var patt1 = /\.([0-9a-z]+)/i;
-        var m5 = filePath.match(patt1);
-    }
-
-    var extname = path.extname(filePath); //Gestion des extensions de fichier et changement du type MIME
-    var contentTypesByExtention = {
-        '.html': 'text/html',
-        '.js': 'text/javascript',
-        '.css':  'text/css'
-    };
-
-    var contentType = contentTypesByExtention[extname] || 'text/plain';
-    fs.exists(__dirname+filePath, function(exists) {
-
-        if (exists) {
-            var html = require('fs').readFileSync(__dirname+filePath);
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(html, 'utf-8');
-        }
-        else {
-            res.writeHead(404);
-            res.end("Erreur 404");
-        }
-    });
-
-
+var html = require('fs').readFileSync(__dirname+'/index.html');
+var server = require('http').createServer(function(req, res){
+    res.end(html);
 });
-app.listen(1337);
-
+server.listen(1337);
 console.log("Serveur NodeJS for LEAP MOTION");
-
-
 var nowjs = require("now");
-var everyone = nowjs.initialize(app);
+var everyone = nowjs.initialize(server);
 var clients = {}; // Attention ne pas initialiser avec [] car bug lors de la transmission de la variable au client
 
 for(var i in clients) {
