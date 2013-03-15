@@ -9,7 +9,7 @@
         <script>
             $(document).ready(function(){
 	            var socket = io.connect(document.location.href);
-	            
+	            var data = {};
 	            var isLeapConnect = false;
 				if ((typeof(WebSocket) == 'undefined') &&
 					(typeof(MozWebSocket) != 'undefined')) {
@@ -64,7 +64,7 @@
                         
                         socket.emit("newClient", data);
                         $('#loginbox').fadeOut();
-                        $('#debug').html('-- '+now.name+' // '+ isLeapConnect);
+                        $('#debug').html('-- '+data.name+' // '+ isLeapConnect);
                         
                         /*now.ready(function(){
                             // On signal l'arrivé d'un nouveau client
@@ -72,6 +72,29 @@
                         });*/
                     }
                 }
+                
+                
+                socket.on("updateClientList", function(clients){
+	                var c=0;
+                    $("#clientList").html('');
+                    for(var i in clients) {
+                            c++;
+                            $('#clientList').append('<a id="'+i+'" href="#null"><li><div>'+clients[i].login +'</div></li></a>');
+                    }
+                    if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
+
+                });
+                
+                 $('#clientList a').live('click',function(){
+                    var idClient = $(this).attr('id');
+                    // L'id du chat est égal à la somme des id des deux clients
+                    var idChat = (idClient)+(now.core.clientId);
+                    if ($('#'+idChat).length == 0){
+                        now.openChat(idClient);
+                    } else {
+                        $('#'+idChat).css('display','block');
+                    }
+                });
 
                /* // Demande d'ouverture d'un chat avec la personne
                 $('#clientList a').live('click',function(){
@@ -129,8 +152,8 @@
                         }
                     }
                     if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
-                }
-            });*/
+                }*/
+            });
             
             
             

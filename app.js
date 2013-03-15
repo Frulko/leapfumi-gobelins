@@ -42,7 +42,7 @@ console.log("Lancement du serveur");
 
 
 var clients = {};
-
+var numClients = 0;
 
 //on lance socket.io et on écoute
 var io = require("socket.io");
@@ -55,6 +55,13 @@ io.sockets.on('connection', function (socket){
     socket.on('newClient', function(data){ //Reception d'un nouveau client
         //socket.broadcast.emit('connection_res', {"to":req.to,"type":req.type,"from":req.from});
         console.log('[ NEW ] '+data.name);
+        //On ajoute le client au tableau en renseignant son pseudo et son statut (connecté ou non)
+	    clients[numClients] =  { login: data.name, statut: 1};
+	    numClients ++;
+	    // On met à jour la liste des connectés
+	    for(var c in clients) {
+	        socket.emit("updateClientList", clients)
+	    }
     });
 
 
@@ -63,11 +70,14 @@ io.sockets.on('connection', function (socket){
         socket.broadcast.emit('connection_success', {"to":res.to,"from":res.from,"connect":res.connect});
 
     });
+    
+    io.sockets.on('disconnect', function () {
+        console.log('DISCONNESSO!!! ');
+
+});
 });
 
-io.sockets.on('disconnect', function () {
-    console.log('user disconnected');
-});
+
 
 
 /*var html = require('fs').readFileSync(__dirname+'/index.html');
