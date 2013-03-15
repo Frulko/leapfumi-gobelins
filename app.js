@@ -43,7 +43,7 @@ console.log("Serveur NodeJS for LEAP MOTION");
 
 
 var nowjs = require("now");
-var everyone = nowjs.initialize(server);
+var everyone = nowjs.initialize(app);
 var clients = {}; // Attention ne pas initialiser avec [] car bug lors de la transmission de la variable au client
 
 for(var i in clients) {
