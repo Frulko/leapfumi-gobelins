@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Facebook Chat Like in NodeJS</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+        <script src="http://localhost:1337/nowjs/now.js"></script>
+        <link rel='stylesheet' href='style.css' type='text/css' media='screen' />
+        <script>
+            $(document).ready(function(){
+	            
+	            var isLeapConnect = false;
+	            // Support both the WebSocket and MozWebSocket objects
+				if ((typeof(WebSocket) == 'undefined') &&
+					(typeof(MozWebSocket) != 'undefined')) {
+				  WebSocket = MozWebSocket;
+				  
+				}
+				
+				init();
+				
+				// Create the socket with event handlers
+				function init() {
+				  //Create and open the socket
+				  ws = new WebSocket("ws://localhost:6437/");
+			
+				  // On successful connection
+				  ws.onopen = function(event) {
+					isLeapConnect = true;
+				  };
+			
+				  // On message received
+				  ws.onmessage = function(event) {
+					console.log("RECEIVE DATA");
+				  };
+			
+				  // On socket close
+				  ws.onclose = function(event) {
+				  	ws = 0;
+					isLeapConnect = false;
+				  }
+			
+				  // On socket error
+				  ws.onerror = function(event) {
+				    isLeapConnect = false;
+					console.log("ERROR");
+				  };
+			   }
+	            
+	            
+	            
+	            
+	            
+                $('#launch').click(function() {
+                    startApp();
+                });
+                
+                
+                
+                function startApp(){
+                    if($('#login').val() != ""){
+                        now.name = $('#login').val();
+                        now.leap = isLeapConnect;
+                        
+                        now.ready(function(){
+                            $('#loginbox').fadeOut();
+                            // On signal l'arrivé d'un nouveau client
+                            now.newClient(now.name, now.leap);
+                            $('#debug').html('-- '+now.name+' // '+ isLeapConnect);
+                        });
+                    }
+                }
+
+                // Demande d'ouverture d'un chat avec la personne
+                $('#clientList a').live('click',function(){
+                    var idClient = $(this).attr('id');
+                    // L'id du chat est égal à la somme des id des deux clients
+                    var idChat = (idClient)+(now.core.clientId);
+                    if ($('#'+idChat).length == 0){
+                        now.openChat(idClient);
+                    } else {
+                        $('#'+idChat).css('display','block');
+                    }
+                });
+
+                // Ajout du chat dans l'interface
+                now.addChat = function(idChat,idRecever,recever,sender){
+                    var login;
+                    if(idRecever == now.core.clientId) login = sender;
+                    else login = recever;
+                    $('#chatList').append('<div class="popup-chat" id="'+idChat+'"><div class="popup-chat-header">'+login+' <a href="#null" rel="'+idChat+'"><img src="img/close.gif" alt="" /></a></div><div class="popup-chat-talk"></div><div class="popup-chat-input"><input name="'+idChat+'" id="msg-'+idChat+'" type="text" /></div></div></div>');
+                    $('#msg-'+idChat).focus();
+                }
+
+                // Lorsque l'on presse entrée on envoie le message
+                $(document).keypress(function(e) {
+                    if(e.keyCode == 13) {
+                        var id = e.target.name;
+                        if($('#msg-'+id).val() != ''){
+                            var msg = $('#msg-'+id).val();
+                            $('#msg-'+id).val('');
+                            now.sendMessage(msg,id);
+                        }
+                    }
+                });
+
+                // Affichage des messages reçus
+                now.displayMessage = function(idChat, message){
+                    $('#'+idChat).css('display','block');
+                    $('#'+idChat+' .popup-chat-talk').append('<div class="user-msg"><div class="user-text">'+message+'</div></div>');
+                }
+
+                // Masquer un chat
+                $('.popup-chat-header a').live('click',function(){
+                    var idChat = $(this).attr('rel');
+                    $('#'+idChat).css('display','none');
+                });
+
+                // Fonction mettant à jour la liste des connectés
+                now.updateClientList = function(clients){
+                    var c=0;
+                    $("#clientList").html('');
+                    for(var i in clients) {
+                        if(i != now.core.clientId) {
+                            c++;
+                            $('#clientList').append('<a id="'+i+'" href="#null"><li><div>'+clients[i].login +'</div></li></a>');
+                        }
+                    }
+                    if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
+                }
+            });
+            
+            
+            
+            
+		   
+		   
+        </script>
+    </head>
+    <body >
+       
+        <div id="loginbox">
+            Hi guy ! What's your name ?</br>
+            <input type="text" id="login"/><input type="button" value="Go" id="launch">
+        </div>
+        <div id="debug">Hello</div>
+        <div id="nav-right">
+            <ul id="clientList">
+            </ul>
+        </div>
+        <div id="chatList">
+        </div>
+    </body>
+</html>
