@@ -1,65 +1,29 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>Facebook Chat Like in NodeJS</title>
+        <title>LeapFumi</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <script type="text/javascript" src="jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="socket.io/socket.io.js"></script>
-        <link rel='stylesheet' href='style.css' type='text/css' media='screen' />
-        <script>
-        	var socket;
-            $(document).ready(function(){
-	            socket = io.connect("http://localhost:8080");
-	            var data = {};
-	            
-	            
-	           var sign = "rock";
-	           var score = [0,0]
-	           var player = "blue";
-	           
-	           	socket.emit("newClient", {name: player});
-		        
-	            
-	             
-                
-                socket.on("response", function(data){
-                	console.log(data);
-                	$("#result").html(data.winner);
-                	
-                });
-               
-               
-               $('#send').on("click",function(){
-	               
-	               socket.emit("sendLeap", {player: player, sign: sign});
-	               checkSign();
-               });
-            
-               function checkSign(){
-	               $("#own").html("You : "+sign);
-	               $('#result').html("wait ...");
-               }
-               
-               setInterval(function(){
-	               
-	               $('#score').html(score[0]+" - "+score[1]);
-	               
-               }, 1000);
-            
-            
-            });
-            
-
-
-		   
-        </script>
-    </head>
+           </head>
     <body >
        
         <input type="button" value="SEND LEAP SIGN" id="send"/>
         <div id="own">You</div>
         <div id="adverse">P2</div>
-        <div id="score">0 - 0</div>
+        <div id="cpt">0</div>
         <div id="result">NO SIGN</div>
+        
+        
+        
+        
+        
+        <script type="text/javascript" src="jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="plugins.js"></script>
+        <script>
+           var socket;
+           var player = "blue";
+        </script>
+        <script type="text/javascript" src="main.js"></script>
+
     </body>
 </html>
