@@ -42,8 +42,9 @@ console.log("Lancement du serveur");
 
 
 var clients = {};
+var groups = {};
 var numClients = 0;
-
+var numGroups = 0;
 //on lance socket.io et on écoute
 var io = require("socket.io");
 var io = io.listen(app,{ log: false }); //Lancement du serveur de socket et non affichage des logs
@@ -64,6 +65,13 @@ io.sockets.on('connection', function (socket){
 	    }
     });
 
+    socket.on('newGroup', function(data){ //Reception d'un nouveau client
+    	var i = data.idClient
+	    console.log('[ GROUP ] ['+data.idCurrent+'] to ['+clients[i].login+']');
+	    groups[numGroups] =  { from: data.idCurrent, to: data.idClient, status:1};
+	    numGroups ++;
+
+    });
 
     socket.on('connection_ok', function(res){ //Reception d'un nouveau client
 

@@ -55,11 +55,12 @@
                     startApp();
                 });
                 
-                
+                var name;
                 
                 function startApp(){
                     if($('#login').val() != ""){
-                        data.name = $('#login').val();
+                    	name = $('#login').val();
+                        data.name = name;
                         data.leap = isLeapConnect;
                         
                         socket.emit("newClient", data);
@@ -78,8 +79,11 @@
 	                var c=0;
                     $("#clientList").html('');
                     for(var i in clients) {
-                            c++;
+                    		if(clients[i].login != name){
+	                    		 c++;
                             $('#clientList').append('<a id="'+i+'" href="#null"><li><div>'+clients[i].login +'</div></li></a>');
+                    		}
+                           
                     }
                     if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
 
@@ -87,13 +91,11 @@
                 
                  $('#clientList a').live('click',function(){
                     var idClient = $(this).attr('id');
-                    // L'id du chat est égal à la somme des id des deux clients
-                    var idChat = (idClient)+(now.core.clientId);
-                    if ($('#'+idChat).length == 0){
-                        now.openChat(idClient);
-                    } else {
-                        $('#'+idChat).css('display','block');
-                    }
+                    
+                    data.idClient = idClient;
+                    data.idCurrent = name;
+
+                        socket.emit("newGroup", data);
                 });
 
                /* // Demande d'ouverture d'un chat avec la personne
