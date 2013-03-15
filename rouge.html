@@ -1,65 +1,117 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>Facebook Chat Like in NodeJS</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <script type="text/javascript" src="jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="socket.io/socket.io.js"></script>
-        <link rel='stylesheet' href='style.css' type='text/css' media='screen' />
-        <script>
-        	var socket;
-            $(document).ready(function(){
-	            socket = io.connect("http://localhost:8080");
-	            var data = {};
-	            
-	            
-	           var sign = "paper";
-	           var score = [0,0]
-	           var player = "red";
-	           
-	           	socket.emit("newClient", {name: player});
-		        
-	            
-	             
-                
-                socket.on("response", function(data){
-                	console.log(data);
-                	$("#result").html(data.winner);
-                	
-                });
-               
-               
-               $('#send').on("click",function(){
-	               
-	               socket.emit("sendLeap", {player: player, sign: sign});
-	               checkSign();
-               });
-            
-               function checkSign(){
-	               $("#own").html("You : "+sign);
-	               $('#result').html("wait ...");
-               }
-               
-               setInterval(function(){
-	               
-	               $('#score').html(score[0]+" - "+score[1]);
-	               
-               }, 1000);
-            
-            
-            });
-            
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<html>
+  <head>
+    <title>Leapfumi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link href="css/main.css" rel="stylesheet" media="screen">
+    <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+  </head>
+  <body>
+    <div id="overlay">
+      <div id="pop-welcome"></div>
+      <div id="pop-end"><span>BLA<span></div>
+    </div>
+    <div class="score-bar">
+      <div class="players">
+        <div class="player" id="player1"></div>
+        <div class="player" id="player2"></div>
+      </div>
+      <div class="scores">
+        <div class="score" id="score1">0</div>
+        <div class="score">-</div>
+        <div class="score" id="score2">0</div>
+      </div>
+      <div class="etat-leap" id="off"></div>
+    </div>
+    <div class="inner">
+      <div class="main1-inner">
+        <div class="main main1" id ="main1wait"></div>
+        <div class="main main1" id ="main1rock"></div>
+        <div class="main main1" id ="main1paper"></div>
+        <div class="main main1" id ="main1scissors"></div>
+      </div>
+      <div class="main2-inner">
+        <div class="main main2" id ="main2wait"></div>
+        <div class="main main2" id ="main2rock"></div>
+        <div class="main main2" id ="main2paper"></div>
+        <div class="main main2" id ="main2scissors"></div>
+      </div>
+      <div id="cpt"></div>
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="js/jsmovieclip-1.js"></script>
+    <script>
+
+    var main1scissors = document.getElementById('main1scissors'),
+                    movieclip2 = new JSMovieclip(main1scissors, {
+                        frames : [{ x : 0, y : 0 }, { x : 697, y : 0 }, { x : 1394, y : 0 }, { x : 2091, y : 0 }, { x : 2788, y : 0 }, { x : 3485, y : 0 }, { x : 4182, y : 0 }, { x : 4879, y : 0 }, { x : 4879, y : 0 }, { x : 5576, y : 0 }, { x : 6273, y : 0 }, { x : 4879, y : 0 }, { x : 6970, y : 0 }, { x : 0, y : 827 }, { x : 697, y : 827 }, { x : 0, y : 0 }],
+                        framerate : 24
+                    }).play(true);
+
+    var main1paper = document.getElementById('main1paper'),
+                    movieclip2 = new JSMovieclip(main1paper, {
+                        frames : [{ x : 1394, y : 827 }, { x : 2343, y : 827 }, { x : 3292, y : 827 }, { x : 4241, y : 827 }, { x : 5190, y : 827 }, { x : 6139, y : 827 }, { x : 7088, y : 827 }, { x : 0, y : 1940 }, { x : 949, y : 1940 }, { x : 949, y : 1940 }, { x : 7088, y : 827 }, { x : 1898, y : 1940 }, { x : 2847, y : 1940 }, { x : 3796, y : 1940 }, { x : 4745, y : 1940 }, { x : 1394, y : 827 }],
+                        framerate : 24
+                    }).play(true); 
+
+    var main1rock = document.getElementById('main1rock'),
+                    movieclip2 = new JSMovieclip(main1rock, {
+                        frames : [{ x : 5694, y : 1940 }, { x : 6414, y : 1940 }, { x : 7134, y : 1940 }, { x : 0, y : 3053 }, { x : 720, y : 3053 }, { x : 1440, y : 3053 }, { x : 2160, y : 3053 }, { x : 2880, y : 3053 }, { x : 2880, y : 3053 }, { x : 3600, y : 3053 }, { x : 2160, y : 3053 }, { x : 4320, y : 3053 }, { x : 5040, y : 3053 }, { x : 5760, y : 3053 }, { x : 6480, y : 3053 }, { x : 5694, y : 1940 }],
+                        framerate : 24
+                    }).play(true);
+
+    var main2scissors = document.getElementById('main2scissors'),
+                    movieclip2 = new JSMovieclip(main2scissors, {
+                        frames : [{ x : 0, y : 0 }, { x : 944, y : 0 }, { x : 1888, y : 0 }, { x : 2832, y : 0 }, { x : 0, y : 1078 }, { x : 944, y : 1078 }, { x : 1888, y : 1078 }, { x : 2832, y : 1078 }, { x : 0, y : 2156 }, { x : 0, y : 2156 }, { x : 944, y : 2156 }, { x : 2832, y : 1078 }, { x : 1888, y : 2156 }, { x : 2832, y : 2156 }, { x : 0, y : 3234 }, { x : 0, y : 0 }],
+                        framerate : 24
+                    }).play(true);
+
+    var main2paper = document.getElementById('main2paper'),
+                    movieclip2 = new JSMovieclip(main2paper, {
+                        frames : [{ x : 944, y : 3234 }, { x : 1670, y : 3234 }, { x : 2396, y : 3234 }, { x : 3122, y : 3234 }, { x : 0, y : 4312 }, { x : 726, y : 4312 }, { x : 1452, y : 4312 }, { x : 2178, y : 4312 }, { x : 2178, y : 4312 }, { x : 2904, y : 4312 }, { x : 1452, y : 4312 }, { x : 0, y : 5157 }, { x : 726, y : 5157 }, { x : 1452, y : 5157 }, { x : 2178, y : 5157 }, { x : 944, y : 3234 }],
+                        framerate : 24
+                    }).play(true); 
+
+    var main2rock = document.getElementById('main2rock'),
+                    movieclip2 = new JSMovieclip(main2rock, {
+                        frames : [{ x : 2904, y : 5157 }, { x : 0, y : 6002 }, { x : 637, y : 6002 }, { x : 1274, y : 6002 }, { x : 1911, y : 6002 }, { x : 2548, y : 6002 }, { x : 3185, y : 6002 }, { x : 0, y : 6760 }, { x : 0, y : 6760 }, { x : 637, y : 6760 }, { x : 3185, y : 6002 }, { x : 1274, y : 6760 }, { x : 1911, y : 6760 }, { x : 2548, y : 6760 }, { x : 3185, y : 6760 }, { x : 2904, y : 5157 }],
+                        framerate : 24
+                    }).play(true);  
 
 
-		   
-        </script>
-    </head>
-    <body >
-       
-        <input type="button" value="SEND LEAP SIGN" id="send"/>
-        <div id="own">You</div>
-        <div id="adverse">P2</div>
-        <div id="score">0 - 0</div>
-        <div id="result">NO SIGN</div>
-    </body>
+
+$('.main').css('visibility', 'hidden');
+$('#main2wait').css('visibility', 'visible');
+$('#main1wait').css('visibility', 'visible');
+
+$('#pop-welcome').on('click', function(e){
+  $('#overlay').hide();
+  $(document).trigger('start');
+  $('#pop-welcome').hide();
+})
+
+$('#pop-end').on('click', function(e){
+  $('#overlay').hide();
+  $(document).trigger('start');
+  $('#pop-end').hide();
+})
+
+    </script>
+
+    <div id="cpt"></div>
+    
+
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.0.min.js"><\/script>')</script>
+    <script src="js/plugins.js"></script>
+    <script type="text/javascript" src="socket.io/socket.io.js"></script>
+    <script>
+           var player = "red";
+    </script>
+    <script src="main.js"></script>
+  </body>
 </html>

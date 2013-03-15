@@ -104,35 +104,28 @@ function checkSign(player){
 	
 	
 	if(party[own] != "none" && party[adverse] != "none"){
+		result[own] = party[own];
+		result[adverse] = party[adverse];
 
-		console.log("Players : "+own+" - "+adverse);
-		
-		var p = own == "blue"?"blue":"red";
-		
-		if(party[own] == "rock" && party[adverse] == "scissor"){
-			
-			
-			
-			return result[own];
+		if(party[own] == party[adverse]){
+			result["winner"] = "nobody";
+		}
+		else if(party[own] == "rock" && party[adverse] == "scissor"){
+			result["winner"] = own;
 		}
 		else if(party[own] == "scissor" && party[adverse] == "paper"){
-			return result[own] = party[own];
+			result["winner"] = own;
 		}
 		else if(party[own] == "paper" && party[adverse] == "rock"){
-			return result[own] = party[own];
-		}
-		else if(party[own] == party[adverse]){
-			return result[own] = party[own];
+			result["winner"] = own;
 		}
 		else{
-			return result[adverse] = party[adverse];
+			 result["winner"] = adverse;
 		}
-		
-		
 	}else{
 		return false;
 	}
-	
+	return result;
 }
 //Pierre bat le ciseau
 //Ciseau bat la feuille
