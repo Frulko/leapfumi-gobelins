@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 var socket;
 var isPlay = false;
+=======
+>>>>>>> origin/master
 $(document).ready(function(){
 	            socket = io.connect("http://localhost:8080");
 	            var data = {};
@@ -7,6 +10,7 @@ $(document).ready(function(){
 	           	socket.emit("newClient", {name: player});
                 socket.on("response", function(data){
                 	console.log(data);
+<<<<<<< HEAD
                	
                 	if(player == "red"){
                 		setHand2(currentFigure);
@@ -22,6 +26,16 @@ $(document).ready(function(){
 					$('#overlay').show();
                 	
                 });
+=======
+                	$("#result").html("WINNER : "+data.winner);
+                	$('#adverse').html("BLUE : "+data.red);
+                });
+               
+               
+               $('#send').on("click",function(){
+	               $(document).trigger('start');
+               });
+>>>>>>> origin/master
             });
             
             
@@ -62,6 +76,7 @@ $(document).ready(function(){
 	
 		//EndGame event
 		$(document).on('endGame', function(){
+<<<<<<< HEAD
 			if(player == "red"){
         		setHand2(currentFigure);
         	}else{
@@ -69,6 +84,10 @@ $(document).ready(function(){
         	}
 			socket.emit("sendLeap", {player: player, sign: currentFigure});
 			isPlay = false;
+=======
+			checkSign(currentFigure);
+			socket.emit("sendLeap", {player: player, sign: currentFigure});
+>>>>>>> origin/master
 		});
 		
 		
@@ -81,6 +100,7 @@ $(document).ready(function(){
 			var gesture = frame.gestures;
 			
 			if(gesture.length > 0 && gesture[0].type == "circle" && gesture[0].state == "stop"){
+<<<<<<< HEAD
 				 console.log("start");
 				 if(!isPlay){
 				 	  $('#overlay').hide();
@@ -88,6 +108,10 @@ $(document).ready(function(){
 					  $('#pop-welcome').hide();
 				 	isPlay = true;
 				 }
+=======
+				 
+				 $(document).trigger('start');
+>>>>>>> origin/master
 			}
 			
 			if(isWindowFocused && gameIsRunning)
@@ -122,6 +146,7 @@ $(document).ready(function(){
 			return result;
 		}
 		
+<<<<<<< HEAD
 		//Affiche la bonne main 1
 		function setHand1(figure){
 		
@@ -135,6 +160,12 @@ $(document).ready(function(){
 			$('.main2').css('visibility', 'hidden');
 			$('#main2'+figure).css('visibility', 'visible');
 		}
+=======
+		 function checkSign(sign){
+	               $("#own").html("You : "+sign);
+	               $('#result').html("wait ...");
+               }
+>>>>>>> origin/master
 				
 		//Détecte si la fenêtre a le focus :
 		//Cela permet d'éviter de surcharger le leap de calculs inutiles
