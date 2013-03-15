@@ -43,8 +43,7 @@ console.log("Lancement du serveur");
 
 var clients = {};
 var groups = {};
-var numClients = 0;
-var numGroups = 0;
+var party = [];
 //on lance socket.io et on écoute
 var io = require("socket.io");
 var io = io.listen(app,{ log: false }); //Lancement du serveur de socket et non affichage des logs
@@ -57,36 +56,80 @@ io.sockets.on('connection', function (socket){
         //socket.broadcast.emit('connection_res', {"to":req.to,"type":req.type,"from":req.from});
         console.log('[ NEW ] '+data.name);
         //On ajoute le client au tableau en renseignant son pseudo et son statut (connecté ou non)
-	    clients[numClients] =  { login: data.name, statut: 1};
-	    numClients ++;
-	    // On met à jour la liste des connectés
-	    for(var c in clients) {
-	        socket.emit("updateClientList", clients)
-	    }
+	    party[data.name] = "none";
+	    
     });
 
     socket.on('newGroup', function(data){ //Reception d'un nouveau client
-    	var i = data.idClient
+    	var i = data.idClient;
 	    console.log('[ GROUP ] ['+data.idCurrent+'] to ['+clients[i].login+']');
 	    groups[numGroups] =  { from: data.idCurrent, to: data.idClient, status:1};
 	    numGroups ++;
 
     });
 
-    socket.on('connection_ok', function(res){ //Reception d'un nouveau client
-
-        socket.broadcast.emit('connection_success', {"to":res.to,"from":res.from,"connect":res.connect});
+    socket.on('sendLeap', function(data){ //Reception d'un nouveau client
+	    party[data.player] = data.sign;
+	    
+	    var result = checkSign(data.player);
+	    if(result){
+		    socket.broadcast.emit('response', result);
+	    }
+		
+	    
+        //socket.broadcast.emit('connection_success', {"to":res.to,"from":res.from,"connect":res.connect});
 
     });
     
-    io.sockets.on('disconnect', function () {
-        console.log('DISCONNESSO!!! ');
-
-});
+    
 });
 
 
 
+
+function checkSign(player){
+
+	var own = player;
+	var adverse;
+	if( player == "blue" ){
+		adverse = "red";
+	}else{
+		adverse = "blue";
+	}
+	
+	
+	
+	if(party[own] != "none" && party[adverse] != "none"){
+		
+		
+		console.log("Players : "+own+" - "+adverse);
+		
+		if(party[own] == "rock" && party[adverse] == "scissor"){
+			var result = {own:"looser",adverse:"win"}
+			return result;
+		}
+		else if(party[own] == "scissor" && party[adverse] == "paper"){
+			var result = {own:"looser",adverse:"win"}
+			return result;
+		}
+		else if(party[own] == "paper" && party[adverse] == "rock"){
+			var result = {own:"looser",adverse:"win"}
+			return result;
+		}
+		else{
+			var result = {own:"win",adverse:"looser"}
+			return result;
+		}
+		
+		
+	}else{
+		return false;
+	}
+	
+}
+//Pierre bat le ciseau
+//Ciseau bat la feuille
+//Feuille bat la pierre
 
 /*var html = require('fs').readFileSync(__dirname+'/index.html');
 var server = require('http').createServer(function(req, res){

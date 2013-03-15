@@ -76,17 +76,16 @@
                 
                 
                 socket.on("updateClientList", function(clients){
+                	console.log('ok');
 	                var c=0;
                     $("#clientList").html('');
                     for(var i in clients) {
                     		if(clients[i].login != name){
 	                    		 c++;
                             $('#clientList').append('<a id="'+i+'" href="#null"><li><div>'+clients[i].login +'</div></li></a>');
-                    		}
-                           
+                    		}   
                     }
                     if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
-
                 });
                 
                  $('#clientList a').live('click',function(){
