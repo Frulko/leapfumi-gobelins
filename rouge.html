@@ -24,7 +24,7 @@
                 
                 socket.on("response", function(data){
                 	console.log(data);
-                	$("#result").html(data.own);
+                	$("#result").html(data.winner);
                 	
                 });
                
@@ -37,7 +37,7 @@
             
                function checkSign(){
 	               $("#own").html("You : "+sign);
-	              // $('#result').html("wait ...");
+	               $('#result').html("wait ...");
                }
                
                setInterval(function(){

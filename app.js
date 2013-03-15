@@ -73,6 +73,7 @@ io.sockets.on('connection', function (socket){
 	    
 	    var result = checkSign(data.player);
 	    if(result){
+	    	socket.emit('response', result);
 		    socket.broadcast.emit('response', result);
 	    }
 		
@@ -88,7 +89,10 @@ io.sockets.on('connection', function (socket){
 
 
 function checkSign(player){
-
+	
+	var result = {};
+	
+	
 	var own = player;
 	var adverse;
 	if( player == "blue" ){
@@ -100,25 +104,28 @@ function checkSign(player){
 	
 	
 	if(party[own] != "none" && party[adverse] != "none"){
-		
-		
+
 		console.log("Players : "+own+" - "+adverse);
 		
+		var p = own == "blue"?"blue":"red";
+		
 		if(party[own] == "rock" && party[adverse] == "scissor"){
-			var result = {own:"looser",adverse:"win"}
-			return result;
+			
+			
+			
+			return result[own];
 		}
 		else if(party[own] == "scissor" && party[adverse] == "paper"){
-			var result = {own:"looser",adverse:"win"}
-			return result;
+			return result[own] = party[own];
 		}
 		else if(party[own] == "paper" && party[adverse] == "rock"){
-			var result = {own:"looser",adverse:"win"}
-			return result;
+			return result[own] = party[own];
+		}
+		else if(party[own] == party[adverse]){
+			return result[own] = party[own];
 		}
 		else{
-			var result = {own:"win",adverse:"looser"}
-			return result;
+			return result[adverse] = party[adverse];
 		}
 		
 		
