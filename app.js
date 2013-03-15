@@ -1,4 +1,76 @@
-var html = require('fs').readFileSync(__dirname+'/index.html');
+var fs = require('fs');
+var path = require('path');
+var app = require('http').createServer(function(req, res){
+
+    var filePath = req.url;
+    var test = filePath.substring(2);
+    var regex = /id/;
+
+    if (filePath == '/' || test.match(regex)) {
+        filePath = '/index.html';
+    }
+    else{
+        var patt1 = /\.([0-9a-z]+)/i;
+        var m5 = filePath.match(patt1);
+    }
+
+    var extname = path.extname(filePath); //Gestion des extensions de fichier et changement du type MIME
+    var contentTypesByExtention = {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css':  'text/css'
+    };
+    var contentType = contentTypesByExtention[extname] || 'text/plain';
+
+
+    fs.exists(__dirname+filePath, function(exists) {
+
+        if (exists) {
+            var html = require('fs').readFileSync(__dirname+filePath);
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(html, 'utf-8');
+        }
+        else {
+            res.writeHead(404);
+            res.end("Erreur 404");
+        }
+    });
+});
+app.listen(8080);
+                                                     
+console.log("Lancement du serveur");                                                                    
+
+
+var clients = {};
+
+
+//on lance socket.io et on écoute
+var io = require("socket.io");
+var io = io.listen(app,{ log: false }); //Lancement du serveur de socket et non affichage des logs
+
+
+
+//Evenement de connection
+io.sockets.on('connection', function (socket){
+    socket.on('newClient', function(data){ //Reception d'un nouveau client
+        //socket.broadcast.emit('connection_res', {"to":req.to,"type":req.type,"from":req.from});
+        console.log('[ NEW ] '+data.name);
+    });
+
+
+    socket.on('connection_ok', function(res){ //Reception d'un nouveau client
+
+        socket.broadcast.emit('connection_success', {"to":res.to,"from":res.from,"connect":res.connect});
+
+    });
+});
+
+io.sockets.on('disconnect', function () {
+    console.log('user disconnected');
+});
+
+
+/*var html = require('fs').readFileSync(__dirname+'/index.html');
 var server = require('http').createServer(function(req, res){
     res.end(html);
 });
@@ -13,7 +85,7 @@ for(var i in clients) {
 }
 
 everyone.now.newClient = function(name, ifleap){
-	console.log('- New client : '+name+' as a leap : '+ifleap);
+	console.log('- New client : '+name+' as a leap '+);
     //On ajoute le client au tableau en renseignant son pseudo et son statut (connecté ou non)
     clients[this.user.clientId] =  { login: name, statut: 1};
     // On met à jour la liste des connectés
@@ -62,3 +134,4 @@ nowjs.on('disconnect', function() {
 function clean(html){
     return String(html).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+*/

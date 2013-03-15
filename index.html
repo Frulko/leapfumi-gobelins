@@ -4,18 +4,18 @@
         <title>Facebook Chat Like in NodeJS</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-        <script src="http://node.guillaume-dumoulin.fr/nowjs/now.js"></script>
+        <script type="text/javascript" src="socket.io/socket.io.js"></script>
         <link rel='stylesheet' href='style.css' type='text/css' media='screen' />
         <script>
             $(document).ready(function(){
+	            var socket = io.connect(document.location.href);
 	            
 	            var isLeapConnect = false;
-	            // Support both the WebSocket and MozWebSocket objects
 				if ((typeof(WebSocket) == 'undefined') &&
 					(typeof(MozWebSocket) != 'undefined')) {
 				  WebSocket = MozWebSocket;
-				  
 				}
+				
 				
 				init();
 				
@@ -59,19 +59,21 @@
                 
                 function startApp(){
                     if($('#login').val() != ""){
-                        now.name = $('#login').val();
-                        now.leap = isLeapConnect;
+                        data.name = $('#login').val();
+                        data.leap = isLeapConnect;
                         
-                        now.ready(function(){
-                            $('#loginbox').fadeOut();
+                        socket.emit("newClient", data);
+                        $('#loginbox').fadeOut();
+                        $('#debug').html('-- '+now.name+' // '+ isLeapConnect);
+                        
+                        /*now.ready(function(){
                             // On signal l'arrivé d'un nouveau client
                             now.newClient(now.name, now.leap);
-                            $('#debug').html('-- '+now.name+' // '+ isLeapConnect);
-                        });
+                        });*/
                     }
                 }
 
-                // Demande d'ouverture d'un chat avec la personne
+               /* // Demande d'ouverture d'un chat avec la personne
                 $('#clientList a').live('click',function(){
                     var idClient = $(this).attr('id');
                     // L'id du chat est égal à la somme des id des deux clients
@@ -128,7 +130,7 @@
                     }
                     if(c == 0) $('#clientList').append("<li class='alone'>Mmh... You're alone !</li>");
                 }
-            });
+            });*/
             
             
             
