@@ -1,7 +1,7 @@
 var socket;
 var isPlay = false;
 $(document).ready(function(){
-	            socket = io.connect("http://localhost:8080");
+	            socket = io.connect(document.location.href);
 	            var data = {};
 
 	           	socket.emit("newClient", {name: player});
